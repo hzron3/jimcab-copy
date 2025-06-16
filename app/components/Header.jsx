@@ -11,7 +11,7 @@ export default function Header({
   toggleSidebar,
 }) {
   return (
-    <header className="bg-white shadow-sm fixed top-0 left-0 right-0">
+    <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-20">
       <div className="flex items-center justify-between h-18">
         {/* Breadcrumb aligned with sidebar's right edge */}
         <div
