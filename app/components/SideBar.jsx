@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  FaBars,
-  FaTimes,
   FaTachometerAlt,
   FaUsers,
   FaUser,
@@ -12,15 +10,30 @@ import {
   FaMap,
   FaCar,
   FaMoneyBillWave,
+  FaBook,
 } from "react-icons/fa";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function SideBar() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function SideBar({ isCollapsed, isOpen, setIsOpen }) {
   const pathname = usePathname();
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Hardcoded role for demo; replace with your role logic (e.g., context, props, or auth)
+  // Detect screen size on client-side mount
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+
+    // Set initial value
+    handleResize();
+
+    // Add resize listener
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Hardcoded role for demo; replace with your role logic
   const role = "admin"; // TODO: Implement role logic here
 
   // Define navigation links with icons based on role
@@ -37,11 +50,7 @@ export default function SideBar() {
                 label: "App Users",
                 icon: <FaUser />,
               },
-              {
-                href: "/admin/bookings",
-                label: "Bookings",
-                icon: <FaCalendarAlt />,
-              },
+              { href: "/admin/bookings", label: "Bookings", icon: <FaBook /> },
               {
                 href: "/admin/shifts",
                 label: "Shifts",
@@ -76,7 +85,7 @@ export default function SideBar() {
       : role === "driver"
       ? [
           {
-            section: "General",
+            section: "Operations",
             items: [
               {
                 href: "/drivers",
@@ -96,7 +105,7 @@ export default function SideBar() {
             ],
           },
           {
-            section: "Settings",
+            section: "Profile Management",
             items: [
               { href: "/drivers/profile", label: "Profile", icon: <FaUser /> },
               { href: "/drivers/vehicle", label: "Vehicle", icon: <FaCar /> },
@@ -105,42 +114,48 @@ export default function SideBar() {
         ]
       : [];
 
-  // Close sidebar on navigation link click
+  // Close sidebar on navigation link click (mobile only)
   const handleNavClick = () => {
-    setIsOpen(false);
+    if (isMobile && isOpen) {
+      setIsOpen(false);
+    }
   };
 
   return (
     <div>
-      {/* Mobile toggle button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed z-50 p-2 mt-0 mx-2 text-white bg-blue-600 rounded-lg md:hidden hover:bg-blue-700 transition-colors"
-      >
-        {isOpen ? <FaTimes size={16} /> : <FaBars size={16} />}
-      </button>
-
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 w-64 bg-white transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 transition-transform duration-300 z-40 shadow-xl flex flex-col`}
+        className={`fixed inset-y-0 left-0 ${
+          isMobile ? "w-64" : isCollapsed ? "w-16" : "w-64"
+        } bg-white transform ${
+          isMobile && !isOpen ? "-translate-x-full" : "translate-x-0"
+        } md:translate-x-0 transition-all duration-300 z-40 shadow-xl flex flex-col`}
       >
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 flex justify-center">
+        <div
+          className={`p-4 py-6 border-b border-gray-200 flex justify-center ${
+            !isMobile && isCollapsed ? "px-2" : ""
+          }`}
+        >
           <img
             src="/JimcabLogo.webp"
             alt="JimCab Logo"
-            className="h-8 w-auto"
+            className={`${
+              !isMobile && isCollapsed ? "h-8 w-8" : "h-10 w-auto"
+            }`}
           />
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
           {links.length > 0 ? (
             links.map((section) => (
-              <div key={section.section} className="space-y-1">
-                <div className="text-xs font-semibold text-gray-400 uppercase px-3 py-2">
+              <div key={section.section} className="space-y-2">
+                <div
+                  className={`text-sm font-bold text-gray-700 uppercase px-3 py-2 tracking-wide border-b border-gray-100 ${
+                    !isMobile && isCollapsed ? "hidden" : ""
+                  }`}
+                >
                   {section.section}
                 </div>
                 {section.items.map((link) => (
@@ -148,28 +163,39 @@ export default function SideBar() {
                     key={link.href}
                     href={link.href}
                     onClick={handleNavClick}
-                    className={`flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-blue-100 transition-colors ${
+                    className={`flex items-center ${
+                      !isMobile && isCollapsed ? "justify-center" : "space-x-3"
+                    } p-3 rounded-lg text-gray-700 hover:bg-blue-50 transition-colors ${
                       pathname === link.href
-                        ? "bg-blue-100 border-l-4 border-blue-600 text-blue-600 font-medium"
+                        ? "bg-blue-50 border-l-4 border-blue-600 text-blue-600 font-semibold"
                         : ""
                     }`}
+                    title={!isMobile && isCollapsed ? link.label : ""}
                   >
                     <span className="text-lg">{link.icon}</span>
-                    <span>{link.label}</span>
+                    {(!isMobile || isMobile) && !(!isMobile && isCollapsed) && (
+                      <span>{link.label}</span>
+                    )}
                   </Link>
                 ))}
               </div>
             ))
           ) : (
-            <p className="p-3 text-gray-500 text-sm">No role assigned.</p>
+            <p
+              className={`p-3 text-gray-500 text-sm ${
+                !isMobile && isCollapsed ? "hidden" : ""
+              }`}
+            >
+              No role assigned.
+            </p>
           )}
         </nav>
       </div>
 
       {/* Overlay for mobile */}
-      {isOpen && (
+      {isMobile && isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 md:hidden z-30"
+          className="fixed inset-0 bg-black/50 z-30"
           onClick={() => setIsOpen(false)}
         />
       )}

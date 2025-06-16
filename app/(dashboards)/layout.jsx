@@ -1,17 +1,50 @@
 "use client";
 
+import { useState } from "react";
 import SideBar from "../components/SideBar";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 export default function DashboardLayout({ children }) {
-  return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <SideBar />
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto py-10 lg:pl-72">
-        <div className="px-4 sm:px-6 lg:px-8">{children}</div>
-      </main>
+  const toggleSidebar = () => {
+    // On mobile, toggle open/close; on desktop, toggle collapse/expand
+    setIsSidebarOpen((prev) => !prev);
+    setIsSidebarCollapsed((prev) => !prev);
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      {/* Header */}
+      <Header
+        isSidebarCollapsed={isSidebarCollapsed}
+        isSidebarOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+      />
+
+      {/* Main Layout */}
+      <div className="flex flex-1 pt-16">
+        {/* Sidebar */}
+        <SideBar
+          isCollapsed={isSidebarCollapsed}
+          isOpen={isSidebarOpen}
+          setIsOpen={setIsSidebarOpen}
+        />
+
+        {/* Main Content */}
+        <main
+          className={`flex-1 overflow-y-auto py-10 ${
+            isSidebarCollapsed ? "lg:pl-16" : "lg:pl-72"
+          } transition-all duration-300`}
+        >
+          <div className="px-4 ">{children}</div>
+        </main>
+      </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
