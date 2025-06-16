@@ -86,7 +86,7 @@ export default function AdminDashboard() {
       {
         label: "Sales (Ksh)",
         data: [150, 90, 120, 60],
-        backgroundColor: ["blue-500", "#sky-500", "#blue-700", "#sky-700"],
+        backgroundColor: ["#2dd4bf", "#14b8a6", "#0d9488", "#0f766e"],
         borderColor: ["#0d9488", "#0f766e", "#065f46", "#064e3b"],
         borderWidth: 1,
       },
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
         titleColor: "#1f2937",
         bodyColor: "#1f2937",
         callbacks: {
-          label: (context) => `$${context.raw}K`,
+          label: (context) => `${context.raw}K`,
         },
       },
     },
@@ -216,7 +216,7 @@ export default function AdminDashboard() {
     <div className="p-6 sm:p-8 lg:p-10 bg-gray-50 min-h-screen ">
       {/* Dashboard Overview */}
       <section className="mb-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        <h1 className="text-xl lg:text-3xl font-bold text-gray-900 mb-6">
           Admin Dashboard Overview
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-6 max-w-full">
@@ -247,11 +247,11 @@ export default function AdminDashboard() {
       </section>
 
       {/* Active Drivers Table */}
-      <section className="mb-12">
+      <section className="mb-8 lg:mb-12">
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
             <div className="flex items-center justify-between">
-              <h1 className="text-lg font-semibold text-gray-900">
+              <h1 className="text-sm lg:text-lg font-semibold text-gray-900">
                 Active Drivers
               </h1>
               <Link
@@ -268,9 +268,6 @@ export default function AdminDashboard() {
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               <div className="relative overflow-hidden shadow-sm ring-1 ring-black/5 sm:rounded-lg">
-                {/* Gradient fade for scroll indication */}
-                <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none"></div>
-                <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none"></div>
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead className="bg-gray-100">
                     <tr>
@@ -349,10 +346,10 @@ export default function AdminDashboard() {
       </section>
 
       {/* Active Shifts Table */}
-      <section className="mb-12">
+      <section className="mb-8 lg:mb-12">
         <div className="sm:flex-auto">
           <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold text-gray-900">
+            <h1 className="text-sm lg:text-lg font-semibold text-gray-900">
               Active Shifts
             </h1>
             <Link
@@ -364,13 +361,10 @@ export default function AdminDashboard() {
             </Link>
           </div>
         </div>
-        <div className="mt-8 flow-root">
+        <div className="mt-4 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               <div className="relative overflow-hidden shadow-sm ring-1 ring-black/5 sm:rounded-lg">
-                {/* Gradient fade for scroll indication */}
-                <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none"></div>
-                <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none"></div>
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead className="bg-gray-100">
                     <tr>
@@ -449,10 +443,12 @@ export default function AdminDashboard() {
       </section>
 
       {/* Bookings Table */}
-      <section className="mb-12">
+      <section className="mb-8 lg:mb-12">
         <div className="sm:flex-auto">
           <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold text-gray-900">Bookings</h1>
+            <h1 className="text-sm lg:text-lg font-semibold text-gray-900">
+              Bookings
+            </h1>
             <Link
               href="/admin/bookings"
               className="inline-flex items-center text-sm font-medium text-teal-600 hover:text-teal-800 hover:underline focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 transition-colors duration-200"
@@ -462,13 +458,10 @@ export default function AdminDashboard() {
             </Link>
           </div>
         </div>
-        <div className="mt-8 flow-root">
+        <div className="mt-2 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               <div className="relative overflow-hidden shadow-md ring-1 ring-teal-200 sm:rounded-xl">
-                {/* Gradient fade for scroll indication */}
-                <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none"></div>
-                <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none"></div>
                 <table className="min-w-full divide-y divide-teal-300">
                   <thead className="bg-gradient-to-r from-teal-600 to-teal-700 text-white">
                     <tr>
@@ -584,10 +577,12 @@ export default function AdminDashboard() {
       </section>
 
       {/* Zones Table */}
-      <section className="mb-12">
+      <section className="mb-8 lg:mb-12">
         <div className="sm:flex-auto">
           <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold text-gray-900">Zones</h1>
+            <h1 className="text-sm lg:text-lg font-semibold text-gray-900">
+              Zones
+            </h1>
             <Link
               href="/admin/zones"
               className="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-800 hover:underline focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 transition-colors duration-200"
@@ -597,13 +592,10 @@ export default function AdminDashboard() {
             </Link>
           </div>
         </div>
-        <div className="mt-8 flow-root">
+        <div className="mt-3 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               <div className="relative overflow-hidden shadow-lg ring-1 ring-purple-200 sm:rounded-xl">
-                {/* Gradient fade for scroll indication */}
-                <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none"></div>
-                <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none"></div>
                 <table className="min-w-full divide-y divide-purple-300">
                   <thead className="bg-purple-100">
                     <tr>
@@ -683,22 +675,13 @@ export default function AdminDashboard() {
       </section>
 
       {/* Sales per Client (Agency) Bar Chart */}
-      <section className="mb-12">
+      <section className="mb-3 lg:mb-8">
         <div className="sm:flex-auto">
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold text-gray-900">
-              Sales per Client (Agency)
-            </h1>
-            <Link
-              href="/admin/bookings"
-              className="inline-flex items-center text-sm font-medium text-teal-600 hover:text-teal-800 hover:underline focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 transition-colors duration-200"
-            >
-              View All Bookings
-              <FaArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
+          <h1 className="ttext-sm lg:text-lg font-semibold text-gray-900">
+            Sales per Client (Agency)
+          </h1>
         </div>
-        <div className="mt-8 flow-root">
+        <div className="mt-3 flow-root">
           <div className="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               <div className="relative overflow-hidden shadow-md ring-1 ring-teal-200 sm:rounded-xl bg-white">
