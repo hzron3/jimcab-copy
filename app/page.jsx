@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -14,27 +16,24 @@ export default function Home() {
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
-  const emailRegex =
-    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  // Hardcoded credentials (FOR DEMONSTRATION ONLY)
+  const HARDCODED_EMAIL = "admin@example.com";
+  const HARDCODED_PASSWORD = "admin123";
 
   const validateForm = () => {
     let isValid = true;
     const newErrors = { email: "", password: "" };
 
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-      isValid = false;
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+    if (formData.email !== HARDCODED_EMAIL) {
+      newErrors.email = "Invalid email address";
       isValid = false;
     }
 
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-      isValid = false;
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
+    if (formData.password !== HARDCODED_PASSWORD) {
+      newErrors.password = "Invalid password";
       isValid = false;
     }
 
@@ -48,7 +47,11 @@ export default function Home() {
 
     if (validateForm()) {
       try {
-        console.log("Form submitted:", formData);
+        console.log("Login successful:", formData);
+        // Set authentication flag in sessionStorage
+        sessionStorage.setItem("isAuthenticated", "true");
+        // Redirect to /admin
+        router.push("/admin");
         setFormData({ email: "", password: "", rememberMe: false });
       } catch (error) {
         setErrors({ ...errors, form: "Submission failed. Please try again." });
@@ -66,18 +69,22 @@ export default function Home() {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
-    <div className="flex min-h-full flex-1">
+    <div className="flex min-h-full flex-1 h-screen items-center">
       <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-        <div className="mx-auto w-full max-w-sm lg:w-96">
+        <div className="mx-auto w-full max-w-sm lg:w-[28rem]">
           <div>
             <Image
               alt="JimCab Logo"
-              src="/jimcabLogo.webp"
-              width={120} // Adjust based on your logo's dimensions
+              src="/JimcabLogo.webp"
+              width={120}
               height={40}
               className="h-10 w-auto"
-              priority // Load logo immediately as it's above the fold
+              priority
             />
             <h2 className="mt-8 text-2xl/9 font-bold tracking-tight text-gray-900">
               Sign in to your account
@@ -91,7 +98,7 @@ export default function Home() {
                   htmlFor="email"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Email address
+                  Email address <span className="text-red-600">*</span>
                 </label>
                 <div className="mt-2">
                   <input
@@ -100,6 +107,7 @@ export default function Home() {
                     type="email"
                     required
                     autoComplete="email"
+                    placeholder="admin@example.com"
                     value={formData.email}
                     onChange={handleChange}
                     className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
@@ -117,21 +125,36 @@ export default function Home() {
                   htmlFor="password"
                   className="block text-sm/6 font-medium text-gray-900"
                 >
-                  Password
+                  Password <span className="text-red-600">*</span>
                 </label>
-                <div className="mt-2">
+                <div className="mt-2 relative">
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     autoComplete="current-password"
+                    placeholder="••••••••"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
+                    className={`block w-full rounded-md bg-white px-3 py-1.5 pr-10 text-base text-gray-900 outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
                       errors.password ? "outline-red-500" : "outline-gray-300"
                     }`}
                   />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      <FiEyeOff size={20} />
+                    ) : (
+                      <FiEye size={20} />
+                    )}
+                  </button>
                   {errors.password && (
                     <p className="mt-2 text-sm text-red-600">
                       {errors.password}
@@ -185,7 +208,7 @@ export default function Home() {
                 <div className="text-sm/6">
                   <a
                     href="#"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
+                    className="font-semibold text-[#034cfd] hover:text-blue-700"
                   >
                     Forgot password?
                   </a>
@@ -198,8 +221,8 @@ export default function Home() {
                   disabled={isSubmitting}
                   className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
                     isSubmitting
-                      ? "bg-indigo-400 cursor-not-allowed"
-                      : "bg-indigo-600 hover:bg-indigo-500"
+                      ? "bg-[#034cfd] cursor-not-allowed"
+                      : "bg-[#034cfd] hover:bg-blue-700"
                   }`}
                 >
                   {isSubmitting ? "Signing in..." : "Sign in"}
@@ -209,15 +232,16 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="relative hidden w-0 flex-1 lg:block">
+      <div className="relative hidden w-0 flex-1 lg:block bg-gray-200">
         <Image
           alt="Background"
           src="/AuthPage.webp"
-          fill // Replaces absolute inset-0 size-full
-          className="object-cover"
-          sizes="100vw"
-          quality={75} // Adjust quality for optimization
+          width={1280}
+          height={720}
+          className="object-cover w-full h-full"
+          quality={75}
         />
+        <div className="absolute inset-0 bg-black opacity-50"></div>
       </div>
     </div>
   );
