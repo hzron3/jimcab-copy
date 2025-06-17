@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Polygon } from "react-leaflet";
+import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 import {
   PlusIcon,
   MapIcon,
@@ -12,6 +11,31 @@ import {
   GlobeAltIcon,
 } from "@heroicons/react/24/outline";
 import ZoneModals from "@/app/components/ZoneModals";
+
+// Dynamically import react-leaflet components with SSR disabled
+const MapContainer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
+  {
+    ssr: false,
+  }
+);
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
+  {
+    ssr: false,
+  }
+);
+const Polygon = dynamic(
+  () => import("react-leaflet").then((mod) => mod.Polygon),
+  {
+    ssr: false,
+  }
+);
+
+// Dynamically import Leaflet
+const L = dynamic(() => import("leaflet").then((mod) => mod.default), {
+  ssr: false,
+});
 
 // Mock zone data with boundaries
 const mockZones = [
@@ -159,6 +183,20 @@ const ZonesPage = () => {
   const rowsPerPage = 10;
   const mapRef = useRef(null);
 
+  // Fix Leaflet default icon paths
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      import("leaflet").then((L) => {
+        delete L.Icon.Default.prototype._getIconUrl;
+        L.Icon.Default.mergeOptions({
+          iconRetinaUrl: "/leaflet/marker-icon-2x.png",
+          iconUrl: "/leaflet/marker-icon.png",
+          shadowUrl: "/leaflet/marker-shadow.png",
+        });
+      });
+    }
+  }, []);
+
   // Fetch zones on mount
   useEffect(() => {
     const loadZones = async () => {
@@ -190,7 +228,11 @@ const ZonesPage = () => {
   // Handle zone click to display map
   const handleZoneClick = (zone) => {
     setSelectedZone(zone);
-    if (mapRef.current && zone.boundaries.length > 0) {
+    if (
+      mapRef.current &&
+      zone.boundaries.length > 0 &&
+      typeof L !== "undefined"
+    ) {
       const bounds = L.latLngBounds(zone.boundaries);
       mapRef.current.fitBounds(bounds);
     }
@@ -303,7 +345,7 @@ const ZonesPage = () => {
               </button>
               <button
                 onClick={() => setIsAddModalOpen(true)}
-                className="px-3 py-1.5 text-xs sm:text-sm sm:px-4 sm:py-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-lg hover:from-indigo-700 hover:to-blue-700 transition duration-300 ease-in-out w-28 sm:w-40"
+                className="px-3 py-1.5 text-xs sm:text-sm sm:px-4 sm:py-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded Haunted-lg hover:from-indigo-700 hover:to-blue-700 transition duration-300 ease-in-out w-28 sm:w-40"
               >
                 <PlusIcon className="h-5 w-5 inline mr-1" /> Add Zone
               </button>
@@ -350,26 +392,28 @@ const ZonesPage = () => {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="h-96">
-                <MapContainer
-                  center={selectedZone.boundaries[0] || [-1.2864, 36.8172]}
-                  zoom={13}
-                  style={{ height: "100%", width: "100%" }}
-                  ref={mapRef}
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  />
-                  {selectedZone.boundaries.length > 0 && (
-                    <Polygon
-                      positions={selectedZone.boundaries}
-                      pathOptions={{
-                        color: selectedZone.color,
-                        fillOpacity: 0.4,
-                      }}
+                {typeof window !== "undefined" && (
+                  <MapContainer
+                    center={selectedZone.boundaries[0] || [-1.2864, 36.8172]}
+                    zoom={13}
+                    style={{ height: "100%", width: "100%" }}
+                    ref={mapRef}
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     />
-                  )}
-                </MapContainer>
+                    {selectedZone.boundaries.length > 0 && (
+                      <Polygon
+                        positions={selectedZone.boundaries}
+                        pathOptions={{
+                          color: selectedZone.color,
+                          fillOpacity: 0.4,
+                        }}
+                      />
+                    )}
+                  </MapContainer>
+                )}
               </div>
               <div className="space-y-2">
                 <p>
