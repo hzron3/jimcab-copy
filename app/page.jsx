@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -16,27 +17,23 @@ export default function Home() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
-  const emailRegex =
-    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  // Hardcoded credentials (FOR DEMONSTRATION ONLY)
+  const HARDCODED_EMAIL = "admin@example.com";
+  const HARDCODED_PASSWORD = "admin123";
 
   const validateForm = () => {
     let isValid = true;
     const newErrors = { email: "", password: "" };
 
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-      isValid = false;
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+    if (formData.email !== HARDCODED_EMAIL) {
+      newErrors.email = "Invalid email address";
       isValid = false;
     }
 
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-      isValid = false;
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
+    if (formData.password !== HARDCODED_PASSWORD) {
+      newErrors.password = "Invalid password";
       isValid = false;
     }
 
@@ -50,7 +47,11 @@ export default function Home() {
 
     if (validateForm()) {
       try {
-        console.log("Form submitted:", formData);
+        console.log("Login successful:", formData);
+        // Set authentication flag in sessionStorage
+        sessionStorage.setItem("isAuthenticated", "true");
+        // Redirect to /admin
+        router.push("/admin");
         setFormData({ email: "", password: "", rememberMe: false });
       } catch (error) {
         setErrors({ ...errors, form: "Submission failed. Please try again." });
@@ -106,7 +107,7 @@ export default function Home() {
                     type="email"
                     required
                     autoComplete="email"
-                    placeholder="gicherudennis@gmail.com"
+                    placeholder="admin@example.com"
                     value={formData.email}
                     onChange={handleChange}
                     className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
@@ -130,7 +131,7 @@ export default function Home() {
                   <input
                     id="password"
                     name="password"
-                    type={showPassword ? "text" : "password"} // Toggle input type
+                    type={showPassword ? "text" : "password"}
                     required
                     autoComplete="current-password"
                     placeholder="••••••••"

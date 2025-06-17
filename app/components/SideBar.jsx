@@ -141,7 +141,7 @@ export default function SideBar({ isCollapsed, isOpen, setIsOpen }) {
             src="/JimcabLogo.webp"
             alt="JimCab Logo"
             className={`${
-              !isMobile && isCollapsed ? "h-8 w-8" : "h-10 w-auto"
+              !isMobile && isCollapsed ? "h-4 w-auto" : "h-10 w-auto"
             }`}
           />
         </div>

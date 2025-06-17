@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import SideBar from "../components/SideBar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -8,11 +9,26 @@ import Footer from "../components/Footer";
 export default function DashboardLayout({ children }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const router = useRouter();
+
+  // Check authentication status on mount
+  useEffect(() => {
+    const isAuthenticated = sessionStorage.getItem("isAuthenticated");
+    if (isAuthenticated !== "true") {
+      router.push("/");
+    }
+  }, [router]);
 
   const toggleSidebar = () => {
     // On mobile, toggle open/close; on desktop, toggle collapse/expand
     setIsSidebarOpen((prev) => !prev);
     setIsSidebarCollapsed((prev) => !prev);
+  };
+
+  // Logout handler
+  const handleLogout = () => {
+    sessionStorage.removeItem("isAuthenticated");
+    router.push("/");
   };
 
   return (
@@ -22,6 +38,7 @@ export default function DashboardLayout({ children }) {
         isSidebarCollapsed={isSidebarCollapsed}
         isSidebarOpen={isSidebarOpen}
         toggleSidebar={toggleSidebar}
+        handleLogout={handleLogout} // Pass logout handler to Header
       />
 
       {/* Main Layout */}
@@ -31,6 +48,7 @@ export default function DashboardLayout({ children }) {
           isCollapsed={isSidebarCollapsed}
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
+          handleLogout={handleLogout} // Pass logout handler to SideBar (optional)
         />
 
         {/* Main Content */}
