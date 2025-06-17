@@ -1,13 +1,50 @@
+"use client";
+
 import React, { useRef, useEffect, useCallback, useState, memo } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Polygon,
-  Popup,
-  useMapEvents,
-} from "react-leaflet";
-import L from "leaflet";
-import debounce from "lodash/debounce";
+import dynamic from "next/dynamic";
+import "leaflet/dist/leaflet.css";
+
+// Dynamically import react-leaflet components with SSR disabled
+const MapContainer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
+  {
+    ssr: false,
+  }
+);
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
+  {
+    ssr: false,
+  }
+);
+const Polygon = dynamic(
+  () => import("react-leaflet").then((mod) => mod.Polygon),
+  {
+    ssr: false,
+  }
+);
+const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
+  ssr: false,
+});
+const useMapEvents = dynamic(
+  () => import("react-leaflet").then((mod) => mod.useMapEvents),
+  {
+    ssr: false,
+  }
+);
+
+// Dynamically import Leaflet
+const L = dynamic(() => import("leaflet").then((mod) => mod.default), {
+  ssr: false,
+});
+
+// Dynamically import lodash/debounce
+const debounce = dynamic(
+  () => import("lodash/debounce").then((mod) => mod.default),
+  {
+    ssr: false,
+  }
+);
 
 const ZoneModals = ({
   isAddModalOpen,
@@ -38,15 +75,36 @@ const ZoneModals = ({
   const leadTimeInputRef = useRef(null);
   const [activeInput, setActiveInput] = useState(null);
 
+  // Fix Leaflet default icon paths
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      import("leaflet").then((L) => {
+        delete L.Icon.Default.prototype._getIconUrl;
+        L.Icon.Default.mergeOptions({
+          iconRetinaUrl: "/leaflet/marker-icon-2x.png",
+          iconUrl: "/leaflet/marker-icon.png",
+          shadowUrl: "/leaflet/marker-shadow.png",
+        });
+      });
+    }
+  }, []);
+
   // Debounced map click handler
   const debouncedSetBoundaries = useCallback(
-    debounce((setZone, latlng) => {
-      setZone((prev) => ({
-        ...prev,
-        boundaries: [...prev.boundaries, [latlng.lat, latlng.lng]],
-      }));
-    }, 100),
-    []
+    debounce
+      ? debounce((setZone, latlng) => {
+          setZone((prev) => ({
+            ...prev,
+            boundaries: [...prev.boundaries, [latlng.lat, latlng.lng]],
+          }));
+        }, 100)
+      : (setZone, latlng) => {
+          setZone((prev) => ({
+            ...prev,
+            boundaries: [...prev.boundaries, [latlng.lat, latlng.lng]],
+          }));
+        },
+    [debounce]
   );
 
   const MapEvents = ({ setZone }) => {
@@ -71,7 +129,12 @@ const ZoneModals = ({
 
   // Auto-fit bounds for View All Zones
   useEffect(() => {
-    if (isViewAllModalOpen && viewAllMapRef.current && zones.length > 0) {
+    if (
+      isViewAllModalOpen &&
+      viewAllMapRef.current &&
+      zones.length > 0 &&
+      typeof L !== "undefined"
+    ) {
       const allBounds = zones
         .filter((zone) => zone.boundaries.length > 0)
         .map((zone) => L.latLngBounds(zone.boundaries));
@@ -242,26 +305,30 @@ const ZoneModals = ({
             Zone Boundaries
           </label>
           <div className="h-[350px] rounded-lg overflow-hidden border border-gray-200 shadow-sm">
-            <MapContainer
-              center={zone?.boundaries[0] || [-1.2864, 36.8172]}
-              zoom={13}
-              style={{ height: "100%", width: "100%" }}
-              ref={isEdit ? editMapRef : addMapRef}
-              dragging={!(activeInput === "name" || activeInput === "leadTime")}
-              scrollWheelZoom={false}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              {zone?.boundaries.length > 0 && (
-                <Polygon
-                  positions={zone.boundaries}
-                  pathOptions={{ color: zone.color, fillOpacity: 0.4 }}
+            {typeof window !== "undefined" && (
+              <MapContainer
+                center={zone?.boundaries[0] || [-1.2864, 36.8172]}
+                zoom={13}
+                style={{ height: "100%", width: "100%" }}
+                ref={isEdit ? editMapRef : addMapRef}
+                dragging={
+                  !(activeInput === "name" || activeInput === "leadTime")
+                }
+                scrollWheelZoom={false}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-              )}
-              <MapEvents setZone={setZone} />
-            </MapContainer>
+                {zone?.boundaries.length > 0 && (
+                  <Polygon
+                    positions={zone.boundaries}
+                    pathOptions={{ color: zone.color, fillOpacity: 0.4 }}
+                  />
+                )}
+                <MapEvents setZone={setZone} />
+              </MapContainer>
+            )}
           </div>
           <button
             onClick={() => handleClearBoundaries(setZone)}
@@ -410,28 +477,30 @@ const ZoneModals = ({
       maxWidth="max-w-5xl"
     >
       <div className="h-[80vh] rounded-lg overflow-hidden border border-gray-200 shadow-sm">
-        <MapContainer
-          center={[-1.2864, 36.8172]}
-          zoom={13}
-          style={{ height: "100%", width: "100%" }}
-          ref={viewAllMapRef}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          {zones
-            .filter((zone) => zone.boundaries.length > 0)
-            .map((zone) => (
-              <Polygon
-                key={zone.id}
-                positions={zone.boundaries}
-                pathOptions={{ color: zone.color, fillOpacity: 0.4 }}
-              >
-                <Popup>{zone.name}</Popup>
-              </Polygon>
-            ))}
-        </MapContainer>
+        {typeof window !== "undefined" && (
+          <MapContainer
+            center={[-1.2864, 36.8172]}
+            zoom={13}
+            style={{ height: "100%", width: "100%" }}
+            ref={viewAllMapRef}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            {zones
+              .filter((zone) => zone.boundaries.length > 0)
+              .map((zone) => (
+                <Polygon
+                  key={zone.id}
+                  positions={zone.boundaries}
+                  pathOptions={{ color: zone.color, fillOpacity: 0.4 }}
+                >
+                  <Popup>{zone.name}</Popup>
+                </Polygon>
+              ))}
+          </MapContainer>
+        )}
       </div>
       <div className="sticky bottom-0 bg-white px-6 py-4 border-t border-gray-200 mt-6">
         <div className="flex justify-end">
@@ -456,4 +525,4 @@ const ZoneModals = ({
   );
 };
 
-export default ZoneModals;
+export default memo(ZoneModals);
