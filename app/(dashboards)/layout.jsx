@@ -35,11 +35,11 @@ export default function DashboardLayout({ children }) {
 
         {/* Main Content */}
         <main
-          className={`flex-1 overflow-y-auto py-10 ${
-            isSidebarCollapsed ? "lg:pl-16" : "lg:pl-72"
+          className={`flex-1 overflow-y-auto py-4 ${
+            isSidebarCollapsed ? "lg:pl-16" : "lg:pl-54"
           } transition-all duration-300`}
         >
-          <div className="px-4 ">{children}</div>
+          <div>{children}</div>
         </main>
       </div>
 

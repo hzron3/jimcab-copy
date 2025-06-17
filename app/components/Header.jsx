@@ -16,7 +16,7 @@ export default function Header({
         {/* Breadcrumb aligned with sidebar's right edge */}
         <div
           className={`flex-1 ${
-            isSidebarCollapsed ? "lg:ml-[3rem]" : "lg:ml-[15rem]"
+            isSidebarCollapsed ? "lg:ml-[3rem]" : "lg:ml-[13rem]"
           } transition-all duration-300 pl-4 sm:pl-6`}
         >
           <Breadcrumb

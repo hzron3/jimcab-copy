@@ -126,7 +126,7 @@ export default function SideBar({ isCollapsed, isOpen, setIsOpen }) {
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 ${
-          isMobile ? "w-64" : isCollapsed ? "w-16" : "w-64"
+          isMobile ? "w-54" : isCollapsed ? "w-16" : "w-54"
         } bg-white transform ${
           isMobile && !isOpen ? "-translate-x-full" : "translate-x-0"
         } md:translate-x-0 transition-all duration-300 z-40 shadow-xl flex flex-col`}
@@ -152,7 +152,7 @@ export default function SideBar({ isCollapsed, isOpen, setIsOpen }) {
             links.map((section) => (
               <div key={section.section} className="space-y-2">
                 <div
-                  className={`text-sm font-bold text-gray-700 uppercase px-3 py-2 tracking-wide border-b border-gray-100 ${
+                  className={`text-sm sm:text-lg font-bold text-blue-900 uppercase px-3 py-2 tracking-wide border-b border-gray-100 ${
                     !isMobile && isCollapsed ? "hidden" : ""
                   }`}
                 >
@@ -195,7 +195,7 @@ export default function SideBar({ isCollapsed, isOpen, setIsOpen }) {
       {/* Overlay for mobile */}
       {isMobile && isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30"
+          className="fixed inset-0 bg-black/30 z-30"
           onClick={() => setIsOpen(false)}
         />
       )}
