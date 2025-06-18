@@ -60,13 +60,43 @@ export default function Breadcrumb({
       {/* Sidebar Toggle (All Screens) */}
       <button
         onClick={toggleSidebar}
-        className="text-gray-600 hover:text-gray-900 transition-colors"
+        className={`text-blue-500 hover:text-blue-800 transition-colors ${
+          isMobile
+            ? "fixed bottom-4 right-4 z-50 bg-blue-500 hover:bg-blue-700 text-white hover:text-white p-2 rounded-full shadow-md"
+            : ""
+        }`}
         aria-label="Toggle sidebar"
       >
         {isMobile && isSidebarOpen ? (
-          <FaTimes size={20} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="size-5 sm:size-7"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18 18 6M6 6l12 12"
+            />
+          </svg>
         ) : (
-          <FaBars size={20} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="size-5 sm:size-7"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
+          </svg>
         )}
       </button>
       {breadcrumbs.map((crumb, index) => (

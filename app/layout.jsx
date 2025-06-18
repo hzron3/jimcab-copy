@@ -14,6 +14,11 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "JimCab Fronted",
   description: "This is a JimCab Frontend application",
+  icons: {
+    icon: "/JimcabLogo.webp",
+    apple: "/JimcabLogo.webp",
+    shortcut: "/JimcabLogo.webp",
+  },
 };
 
 export default function RootLayout({ children }) {
