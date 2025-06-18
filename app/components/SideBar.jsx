@@ -33,10 +33,8 @@ export default function SideBar({ isCollapsed, isOpen, setIsOpen }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Hardcoded role for demo; replace with your role logic
-  const role = "admin"; // TODO: Implement role logic here
+  const role = "admin";
 
-  // Define navigation links with icons based on role
   const links =
     role === "admin"
       ? [
